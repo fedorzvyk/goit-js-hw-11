@@ -51,16 +51,18 @@ function onFormSubmit(e) {
 function onLoadMore() {
   // buttonRef.classList.add('is-hidden');
   page += 1;
+
   getImages(seachImages, page)
     .then(data => {
+      imagesMarkup(createGalery(data));
+      lightbox.refresh();
+
       if (countImages >= data.data.totalHits) {
         return Notify.info(
           "We're sorry, but you've reached the end of search results."
         );
+        countImages += data.data.hits.length;
       }
-      imagesMarkup(createGalery(data));
-      lightbox.refresh();
-      countImages += data.data.hits.length;
       // buttonRef.classList.remove('is-hidden');
       // page += 1;
       smoothScroll();
