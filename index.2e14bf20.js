@@ -1,2 +1,0 @@
-var markupCard='<div class="photo-card">\n  <img src="" alt="" loading="lazy" />\n  <div class="info">\n    <p class="info-item">\n      <b>Likes</b>\n    </p>\n    <p class="info-item">\n      <b>Views</b>\n    </p>\n    <p class="info-item">\n      <b>Comments</b>\n    </p>\n    <p class="info-item">\n      <b>Downloads</b>\n    </p>\n  </div>\n</div>';
-//# sourceMappingURL=index.2e14bf20.js.map
