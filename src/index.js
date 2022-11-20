@@ -8,12 +8,22 @@ let countImages = 0;
 const formRef = document.querySelector('.search-form');
 const inputRef = document.querySelector('input');
 const galleryRef = document.querySelector('.gallery');
-const buttonRef = document.querySelector('.load-more');
+// const buttonRef = document.querySelector('.load-more');
 
 formRef.addEventListener('submit', onFormSubmit);
-buttonRef.addEventListener('click', onLoadMore);
+// buttonRef.addEventListener('click', onLoadMore);
 
-buttonRef.classList.add('is-hidden');
+window.addEventListener('scroll', () => {
+  const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
+  // console.log(scrollHeight);
+  // console.log(clientHeight);
+  // console.log(scrollTop);
+  if (scrollHeight - clientHeight === scrollTop) {
+    onLoadMore();
+  }
+});
+
+// buttonRef.classList.add('is-hidden');
 
 function onFormSubmit(e) {
   e.preventDefault();
@@ -32,14 +42,14 @@ function onFormSubmit(e) {
       } else Notify.success(`Hooray! We found ${totalHits} images.`);
       imagesMarkup(createGalery(data));
       lightbox.refresh();
-      buttonRef.classList.remove('is-hidden');
+      // buttonRef.classList.remove('is-hidden');
       smoothScroll();
     })
     .catch(error => console.log(error));
 }
 
 function onLoadMore() {
-  buttonRef.classList.add('is-hidden');
+  // buttonRef.classList.add('is-hidden');
   page += 1;
   getImages(seachImages, page)
     .then(data => {
@@ -51,7 +61,8 @@ function onLoadMore() {
       imagesMarkup(createGalery(data));
       lightbox.refresh();
       countImages += data.data.hits.length;
-      buttonRef.classList.remove('is-hidden');
+      // buttonRef.classList.remove('is-hidden');
+      // page += 1;
       smoothScroll();
     })
     .catch(error => console.log(error));
