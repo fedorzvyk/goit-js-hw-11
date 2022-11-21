@@ -1,6 +1,8 @@
 import { lightbox } from './js/lightbox';
 import { getImages } from './js/axiosAPI';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { Loading } from 'notiflix/build/notiflix-loading-aio';
+import { debounce } from 'debounce';
 let seachImages = '';
 let page = 1;
 let countImages = 0;
@@ -11,29 +13,36 @@ const galleryRef = document.querySelector('.gallery');
 // const buttonRef = document.querySelector('.load-more');
 
 formRef.addEventListener('submit', onFormSubmit);
+window.addEventListener('scroll', debounce(onScroll, 300));
 // buttonRef.addEventListener('click', onLoadMore);
 
-window.addEventListener('scroll', () => {
-  const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
-  // console.log(scrollHeight);
-  // console.log(clientHeight);
+function onScroll() {
+  // const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
   // console.log(scrollTop);
-  if (scrollHeight - clientHeight === scrollTop) {
+  // if (
+  //   1 >= scrollHeight - clientHeight - scrollTop &&
+  //   scrollHeight - clientHeight - scrollTop >= -1
+  // ) {
+  if (
+    window.scrollY + window.innerHeight >=
+    document.documentElement.scrollHeight
+  ) {
     onLoadMore();
   }
-});
+}
 
 // buttonRef.classList.add('is-hidden');
 
 function onFormSubmit(e) {
   e.preventDefault();
   clearGallery();
+  Loading.circle();
   seachImages = inputRef.value;
   page = 1;
 
   getImages(seachImages, page)
     .then(data => {
-      const { totalHits, hits } = data.data;
+      const { totalHits, hits } = data;
       countImages = hits.length;
       if (totalHits === 0) {
         return Notify.failure(
@@ -41,33 +50,38 @@ function onFormSubmit(e) {
         );
       } else Notify.success(`Hooray! We found ${totalHits} images.`);
       imagesMarkup(createGalery(data));
-      lightbox.refresh();
       // buttonRef.classList.remove('is-hidden');
       smoothScroll();
+      // page += 1;
+      Loading.remove();
     })
     .catch(error => console.log(error));
 }
 
-function onLoadMore() {
+async function onLoadMore() {
+  Loading.circle();
   // buttonRef.classList.add('is-hidden');
   page += 1;
-
-  getImages(seachImages, page)
-    .then(data => {
+  if (page < 14) {
+    const data = await getImages(seachImages, page);
+    const { hits, totalHits } = data;
+    if (countImages >= totalHits) {
+      Notify.info("We're sorry, but you've reached the end of search results.");
+      // Loading.remove();
+    }
+    if (countImages < totalHits) {
       imagesMarkup(createGalery(data));
-      lightbox.refresh();
-
-      if (countImages >= data.data.totalHits) {
-        return Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
-        countImages += data.data.hits.length;
-      }
       // buttonRef.classList.remove('is-hidden');
-      // page += 1;
       smoothScroll();
-    })
-    .catch(error => console.log(error));
+    }
+
+    countImages += hits.length;
+    // Loading.remove();
+  } else {
+    Notify.info("We're sorry, but you've reached the end of search results.");
+    // Loading.remove();
+  }
+  Loading.remove();
 }
 
 function clearGallery() {
@@ -75,7 +89,7 @@ function clearGallery() {
 }
 
 function createGalery(data) {
-  return data.data.hits
+  return data.hits
     .map(
       ({
         largeImageURL,
@@ -113,7 +127,8 @@ function createGalery(data) {
 }
 
 function imagesMarkup(string) {
-  return galleryRef.insertAdjacentHTML('beforeend', string);
+  galleryRef.insertAdjacentHTML('beforeend', string);
+  lightbox.refresh();
 }
 
 function smoothScroll() {
