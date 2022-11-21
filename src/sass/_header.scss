@@ -1,0 +1,33 @@
+.header {
+  background-color: rgb(124, 156, 8);
+  // width: 100vw;
+  height: 80px;
+  margin-bottom: 30px;
+}
+
+.search-form {
+  display: flex;
+  justify-content: space-around;
+  padding: 25px 0;
+  width: 320px;
+  margin: 0 auto;
+}
+
+.search-btn {
+  cursor: pointer;
+  background: #252625;
+  color: #fff;
+  border-radius: 20px;
+
+  &:hover {
+    background: #39403c;
+    color: #fff;
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px rgb(199, 236, 120);
+  }
+}
+
+input {
+  border-radius: 5px;
+  padding: 5px 5px;
+}
